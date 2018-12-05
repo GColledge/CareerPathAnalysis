@@ -65,3 +65,27 @@ def makeTestFile(inputFile, outputFile):
 
         newFile.close()
     return True
+
+
+def convertStrings2Indices(inputFile, outputFile, modelDirectory):
+    title2indx, W, V = load_model(modelDirectory);
+    with open(inputFile, 'r') as datafile:
+        newFile = open(outputFile, 'w+');
+        for line in datafile.readlines():
+            line = line.split(',')
+            assert(len(line)==2);
+            ans = line[0]
+            path = line[1]
+            path = path.split()
+            for each in path:
+                try:
+                    newFile.write(title2indx[each])
+#                       except
+                newFile.write('\t')
+            newFile.write(',')
+            try:
+                newFile.write(title2indx[each])
+#                   except when the index doesnt exist.
+            newFile.write('\n')
+        newFile.close();
+    return True
