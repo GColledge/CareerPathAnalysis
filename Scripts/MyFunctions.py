@@ -46,10 +46,9 @@ def load_model(directory):
 # Output:   a file with each line in the following format:
 #               final_job_title,previous_job_title  another_job_title   etc.
 #           each line will represent one persons career path. If not specified,
-#           the file will be saved in the same folder as the inputFile and will
-#           take the name given by the outputFile argument.
-#Returns:   True if no errors occured. False Otherwise.
-
+#           the file will be saved in the same folder as the file being run and
+#           will take the name given by the outputFile argument.
+# Returns:  True if no errors occured. False Otherwise.
 def makeTestFile(inputFile, outputFile):
     with open(inputFile, 'r') as datafile:
         newFile = open(outputFile, 'w+')
@@ -66,7 +65,20 @@ def makeTestFile(inputFile, outputFile):
         newFile.close()
     return True
 
-
+#-----CONVERT STRINGS TO INDICES Function-----
+#This is a specialized function specific to the models and files used in the
+#Career Analysis. It takes training or testing files (in string format) and
+#creates the same file with indices into the given model (in place of strings).
+# Input:    inputFile - the training or test file in string format. This should
+#               be the full path to the file.
+#           outputFile - the name of the file to output as a string.
+#           modelDirectory - the path (as a string) to the model to be used.
+## Output:   a file with each line in the following format:
+#               previous_job_index  another_job_index   etc.,final_job index
+#           each line will represent one persons career path. If not specified,
+#           the file will be saved in the same folder as the file being run and
+#           will take the name given by the outputFile argument.
+# Returns:  True if no errors occured. False Otherwise.
 def convertStrings2Indices(inputFile, outputFile, modelDirectory):
     title2indx, W, V = load_model(modelDirectory);
     with open(inputFile, 'r') as datafile:
@@ -79,13 +91,15 @@ def convertStrings2Indices(inputFile, outputFile, modelDirectory):
             path = path.split()
             for each in path:
                 try:
-                    newFile.write(title2indx[each])
-#                       except
+                    newFile.write(str(title2indx[each]))
+                except KeyError:
+                    newFile.write(str(len(title2indx) - 1))
                 newFile.write('\t')
             newFile.write(',')
             try:
-                newFile.write(title2indx[each])
-#                   except when the index doesnt exist.
+                newFile.write(str(title2indx[each]))
+            except KeyError:
+                newFile.write(str(len(title2indx) - 1))
             newFile.write('\n')
         newFile.close();
     return True
