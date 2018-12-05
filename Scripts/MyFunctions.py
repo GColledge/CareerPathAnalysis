@@ -16,10 +16,10 @@ def prettify(careerPath):
     return careerPathList;
 
 #-----LOAD MODEL FUNCTION-----
-#Input: Directory -  the directory that the json and weights file reside. They
+#Input: Directory -  (string) the directory that the json and weights file reside. They
 #           must be together in the same directory. These are the output files of the
 #           word2vec jupyter notebooks written by Greg Colledge.
-#Output: title2indx - a dictionary with keys that are titles (strings) and
+#Returns: title2indx - a dictionary with keys that are titles (strings) and
 #           values that are the indexes into the title embeddings matrix.
 #       W - The weights of the first hidden layer of the model. The matrix is a
 #            numpy.ndarray with shape NxD where N is the number of unique job
@@ -37,3 +37,31 @@ def load_model(directory):
     W = npz['arr_0']
     V = npz['arr_1']
     return title2indx, W, V
+
+#-----MAKE TEST FILE Function-----
+# Input:    inputFile - (string) the full file path to the file to be used as
+#               input. This must be a text file in the correct format.
+#           outputFile - (string) the file name of the output file including the
+#                file extension. This does not need to include the file path.
+# Output:   a file with each line in the following format:
+#               final_job_title,previous_job_title  another_job_title   etc.
+#           each line will represent one persons career path. If not specified,
+#           the file will be saved in the same folder as the inputFile and will
+#           take the name given by the outputFile argument.
+#Returns:   True if no errors occured. False Otherwise.
+
+def makeTestFile(inputFile, outputFile):
+    with open(inputFile, 'r') as datafile:
+        newFile = open(outputFile, 'w+')
+        for line in datafile.readlines():
+            line = line.split();
+            if len(line) > 2:
+                newFile.write(line[-1])
+                newFile.write(',')
+                for t in range(0, len(line) - 1 , 1):
+                    newFile.write(line[t])
+                    newFile.write('\t')
+                newFile.write('\n')
+
+        newFile.close()
+    return True
