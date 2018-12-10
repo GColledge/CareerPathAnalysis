@@ -6,6 +6,9 @@ This is a file of helper functions that can be imported into notebopoks or other
 
 from json import load as jload
 import numpy as np
+from scipy.spatial.distance import cosine as cos_dist
+from sklearn.metrics.pairwise import pairwise_distances
+from datetime import date
 
 #A function specific to this data set. It takes the career path, makes a list
 #of job titles while removing the underscores.
@@ -103,3 +106,62 @@ def convertStrings2Indices(inputFile, outputFile, modelDirectory):
             newFile.write('\n')
         newFile.close();
     return True
+
+#-----PATH COMPILER-----
+# This function takes a single path, turns it into one vector, and finds the
+# indexes of the closest job titles along with the distance to those titles.
+# Input: path - this is the list of indices in the career path where each job
+#           title is represented by an index from the 'title2indx' for the model
+#           being used.
+#        W - the np array of weights from the model being used.
+#        num - the number of elements to be included in the output lists.
+#            default is 1.
+# Output: closestIndx - index to of the closest job title in W
+#         dists - the cosine distance between the path and the nearest num of
+#            job titles
+#
+def pathCompiler(path, W, num=1):
+    assert(num > 0)
+    #the final path is the vector representing the combination of all job titles.
+    #The algorithm here is subject to change.
+    finalPath = np.empty((1,W.shape[1]),dtype=W.dtype)
+    for index in path:
+        finalPath = finalPath + W[index]
+
+    #find the job title closest to the final path vector
+    distances = pairwise_distances(finalPath.reshape(1,W.shape[1]), W,
+                                    metric='cosine').reshape(W.shape[0])
+    #distances is a list of all distances from finalPath to all job titles. This
+    # function is only returning the closest.
+    closestIndx = distances.argsort()[0:num]
+    dists = []
+    for each in closestIndx:
+        dists.append(distances[each])
+    return closestIndx, dists
+
+#-----DATE CREATOR FUNCTION-----
+# A function for turning a string into a date. This function raises custom
+#   DateExceptions based on incorrect input.
+def dateCreator(dateString):
+    ds = dateString.split('-')
+    #input check
+    if (len(ds) != 3 or not ds[0].isnumeric() or not ds[1].isnumeric()):
+        raise DateException('invalid input for date. Format should be yyyy-mm-dd with integers\nGot {}'.format(dateString))
+    elif(int(ds[0]) < 1950):
+        raise DateException('Invalid year. Year must be after 1950')
+    elif(int(ds[1]) > 12):
+        raise DateException('Invalid month. Month must be between 1 and 12 inclusive.')
+    else:
+        #create the date object
+        dateObject = date(int(ds[0]), int(ds[1]),1)
+        #check that date is in the past
+        if(date.today() - dateObject).days < 0:
+            raise DateException('Invalid date. Date must be in the past. got {}'.format(dateObject.isoformat()))
+        return dateObject
+
+
+# define custom exceptions for these functions
+
+class DateException(Exception):
+       def __init__(self,*args,**kwargs):
+        Exception.__init__(self,*args,**kwargs)
