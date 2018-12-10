@@ -85,7 +85,7 @@ print("Computing PCA")
 pca = PCA(n_components = n_dim)
 W_pca = pca.fit_transform(W)
 print("Computing T-SNE")
-tsne = TSNE(n_components=n_dim)
+tsne = TSNE(n_components=n_dim, perplexity=100, n_iter=3000)
 W_tsne = tsne.fit_transform(W)
 
 #-----SET UP PLOTS-----
