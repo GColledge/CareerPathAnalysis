@@ -85,7 +85,7 @@ print("Computing PCA")
 pca = PCA(n_components = n_dim)
 W_pca = pca.fit_transform(W)
 print("Computing T-SNE")
-tsne = TSNE(n_components=n_dim, perplexity=100, n_iter=3000)
+tsne = TSNE(n_components=n_dim, perplexity=50, n_iter=5000, metric='cosine')
 W_tsne = tsne.fit_transform(W)
 
 #-----SET UP PLOTS-----
@@ -98,8 +98,8 @@ if(n_dim==2):
     if(annotate==True):
         for i, label in enumerate(titleList):
             ax_pca.annotate(label, (W_pca[i,0], W_pca[i,1]))
-    ax_pca.set_xlabel('X Label')
-    ax_pca.set_ylabel('Y Label')
+    # ax_pca.set_xlabel('X Label')
+    # ax_pca.set_ylabel('Y Label')
     ax_pca.set_title('PCA plot')
 
     #TSNE PLOT
@@ -109,8 +109,8 @@ if(n_dim==2):
     if(annotate==True):
         for i, label in enumerate(titleList):
             ax_tsne.annotate(label, (W_tsne[i,0], W_tsne[i,1]))
-    ax_tsne.set_xlabel('X Label')
-    ax_tsne.set_ylabel('Y Label')
+    # ax_tsne.set_xlabel('X Label')
+    # ax_tsne.set_ylabel('Y Label')
     ax_tsne.set_title('T-SNE plot')
     plot.show()
 else:
